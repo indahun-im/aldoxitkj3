@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lookism Characters</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0a0a; font-family: 'Noto Sans KR', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+  /* ── NAVBAR ── */
+  .navbar {
+    position: sticky; top: 0; z-index: 100;
+    background: #0d0d0dcc;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid #ffffff0f;
+    padding: 0 1.2rem;
+    height: 52px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; color: #e8c84a; }
+  .nav-back {
+    display: none; align-items: center; gap: 6px;
+    background: none; border: 0.5px solid #ffffff18;
+    color: #ccc; font-size: 13px; padding: 5px 14px;
+    border-radius: 20px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+    transition: background .2s;
+  }
+  .nav-back:hover { background: #ffffff10; }
+  .nav-back.show { display: flex; }
+
+  /* ── HOME ── */
+  #page-home { animation: fadeIn .3s ease; }
+  .home-header { padding: 2rem 1.2rem 1rem; text-align: center; }
+  .home-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 4px; color: #e8c84a; line-height: 1; }
+  .home-sub { font-size: 11px; color: #444; letter-spacing: 2px; text-transform: uppercase; margin-top: 6px; }
+  .home-divider { border: none; border-top: 0.5px solid #1e1e1e; margin: 1rem 1.2rem 1.2rem; }
+
+  .char-list { padding: 0 1rem 2rem; display: flex; flex-direction: column; gap: 10px; }
+
+  .char-card {
+    background: #111;
+    border: 0.5px solid #222;
+    border-radius: 14px;
+    display: flex; align-items: stretch;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color .2s, transform .15s, box-shadow .2s;
+    position: relative;
+  }
+  .char-card:active { transform: scale(0.985); }
+  .char-card:hover { border-color: #383838; box-shadow: 0 4px 24px #00000055; }
+  .char-card::after {
+    content: '›';
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    color: #333; font-size: 20px;
+  }
+  .char-card.tier-s { border-left: 3px solid #e8c84a; }
+  .char-card.tier-a { border-left: 3px solid #c0c0c0; }
+  .char-card.tier-b { border-left: 3px solid #cd7f32; }
+
+  .char-thumb {
+    width: 80px; height: 100px; object-fit: cover; object-position: top center;
+    flex-shrink: 0; display: block;
+  }
+  .char-thumb-fallback {
+    width: 80px; height: 100px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif; font-size: 26px;
+  }
+  .char-thumb-fallback.s { background: #1a1500; color: #e8c84a; }
+  .char-thumb-fallback.a { background: #141414; color: #aaa; }
+  .char-thumb-fallback.b { background: #110e08; color: #cd7f32; }
+
+  .char-info { padding: .75rem 2rem .75rem .9rem; flex: 1; min-width: 0; }
+  .char-name { font-size: 14.5px; font-weight: 700; color: #efefef; margin-bottom: 2px; }
+  .char-latin { font-size: 10px; color: #444; margin-bottom: 8px; letter-spacing: .5px; }
+  .char-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+  .char-desc { font-size: 11px; color: #666; line-height: 1.6; }
+
+  .tier-pill {
+    font-family: 'Bebas Neue', sans-serif; font-size: 10px; letter-spacing: 1.5px;
+    padding: 2px 7px; border-radius: 4px; float: right; margin: 0 0 4px 6px;
+  }
+  .tp-s { background: #1e1800; color: #e8c84a; border: 0.5px solid #e8c84a33; }
+  .tp-a { background: #161616; color: #c0c0c0; border: 0.5px solid #c0c0c033; }
+  .tp-b { background: #140f08; color: #cd7f32; border: 0.5px solid #cd7f3233; }
+
+  /* badges */
+  .badge { font-size: 9px; padding: 2px 7px; border-radius: 3px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase; }
+  .bg  { background: #1e1500; color: #e8c84a; border: 0.5px solid #e8c84a33; }
+  .br  { background: #160707; color: #e05555; border: 0.5px solid #e0555533; }
+  .bb  { background: #070c18; color: #5588e0; border: 0.5px solid #5588e033; }
+  .bgr { background: #141414; color: #777; border: 0.5px solid #44444433; }
+  .bgg { background: #071007; color: #55b055; border: 0.5px solid #55b05533; }
+
+  /* ── DETAIL ── */
+  #page-detail {
+    display: none; animation: slideIn .3s ease;
+    min-height: 100vh;
+  }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+
+  .detail-hero-wrap { position: relative; width: 100%; height: 260px; overflow: hidden; }
+  .detail-hero-img {
+    width: 100%; height: 100%; object-fit: cover; object-position: top center;
+    display: block; filter: brightness(.85);
+  }
+  .detail-hero-fallback {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif; font-size: 80px;
+  }
+  .detail-hero-fallback.s { background: linear-gradient(160deg, #1e1800 0%, #0a0a0a 100%); color: #e8c84a18; }
+  .detail-hero-fallback.a { background: linear-gradient(160deg, #1a1a1a 0%, #0a0a0a 100%); color: #c0c0c015; }
+  .detail-hero-fallback.b { background: linear-gradient(160deg, #140e06 0%, #0a0a0a 100%); color: #cd7f3215; }
+  .hero-grad {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 130px;
+    background: linear-gradient(transparent, #0a0a0a);
+  }
+  .hero-name-overlay {
+    position: absolute; bottom: 16px; left: 1.2rem; right: 1.2rem;
+  }
+  .hero-tier-pill {
+    font-family: 'Bebas Neue', sans-serif; font-size: 10px; letter-spacing: 2px;
+    padding: 3px 10px; border-radius: 4px; display: inline-block; margin-bottom: 6px;
+  }
+  .hero-char-name {
+    font-size: 26px; font-weight: 700; color: #fff;
+    text-shadow: 0 2px 12px #000a; line-height: 1.1; margin-bottom: 2px;
+  }
+  .hero-char-latin { font-size: 12px; color: #ffffff66; letter-spacing: .5px; }
+
+  .detail-body { padding: 1.2rem 1.2rem 3rem; }
+  .detail-badges { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 16px; }
+  .detail-desc { font-size: 13.5px; color: #888; line-height: 1.8; margin-bottom: 22px; }
+
+  .section-label { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: #383838; margin-bottom: 12px; }
+
+  .stat-row { margin-bottom: 12px; }
+  .stat-head { display: flex; justify-content: space-between; margin-bottom: 5px; }
+  .stat-name { font-size: 12px; color: #666; }
+  .stat-val { font-size: 12px; font-weight: 700; }
+  .sv-s { color: #e8c84a; }
+  .sv-a { color: #c0c0c0; }
+  .sv-b { color: #cd7f32; }
+  .stat-track { background: #1c1c1c; border-radius: 3px; height: 5px; overflow: hidden; }
+  .stat-fill { height: 5px; border-radius: 3px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+  .sf-s { background: linear-gradient(90deg, #b89020, #e8c84a); }
+  .sf-a { background: linear-gradient(90deg, #888, #c0c0c0); }
+  .sf-b { background: linear-gradient(90deg, #8a5520, #cd7f32); }
+
+  .lore-box {
+    background: #111; border: 0.5px solid #1e1e1e;
+    border-radius: 12px; padding: 1.1rem; margin-top: 20px;
+  }
+  .lore-title { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: #383838; margin-bottom: 10px; }
+  .lore-text { font-size: 12.5px; color: #5a5a5a; line-height: 1.9; }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <span class="nav-logo">⚔ Lookism</span>
+  <button class="nav-back" id="nav-back" onclick="goHome()">← Beranda</button>
+</nav>
+
+<!-- HOME PAGE -->
+<div id="page-home">
+  <div class="home-header">
+    <div class="home-title">Lookism Characters</div>
+    <div class="home-sub">Katalog Karakter Manhwa · Klik untuk detail</div>
+  </div>
+  <hr class="home-divider">
+  <div class="char-list">
+
+    <!-- DEGUN -->
+    <div class="char-card tier-s" onclick="openDetail('degun')">
+      <img class="char-thumb" id="thumb-degun"
+        src="img/degun.jpg"
+        onerror="this.style.display='none';document.getElementById('fb-degun').style.display='flex'"
+        alt="Degun">
+      <div class="char-thumb-fallback s" id="fb-degun" style="display:none">DG</div>
+      <div class="char-info">
+        <div class="char-name"><span class="tier-pill tp-s">S-TIER</span>Degun (Gun Park)</div>
+        <div class="char-latin">Park Gun · 박건</div>
+        <div class="char-badges">
+          <span class="badge bg">Top Tier Fighter</span>
+          <span class="badge br">Sadis</span>
+          <span class="badge bb">Mentor</span>
+        </div>
+        <div class="char-desc">Petarung elit paling ditakuti di dunia Lookism.</div>
+      </div>
+    </div>
+
+    <!-- JONGGUN -->
+    <div class="char-card tier-s" onclick="openDetail('jonggun')">
+      <img class="char-thumb" id="thumb-jonggun"
+        src="img/jonggun.jpg"
+        onerror="this.style.display='none';document.getElementById('fb-jonggun').style.display='flex'"
+        alt="Jonggun">
+      <div class="char-thumb-fallback s" id="fb-jonggun" style="display:none">JG</div>
+      <div class="char-info">
+        <div class="char-name"><span class="tier-pill tp-s">S-TIER</span>Jonggun (Goo Kim)</div>
+        <div class="char-latin">Kim Goo · 김구</div>
+        <div class="char-badges">
+          <span class="badge bg">Weapon Master</span>
+          <span class="badge bgg">Santai</span>
+          <span class="badge br">Mematikan</span>
+        </div>
+        <div class="char-desc">Partner Gun Park, ahli senjata kelas dewa.</div>
+      </div>
+    </div>
+
+    <!-- CHUNSIM -->
+    <div class="char-card tier-a" onclick="openDetail('chunsim')">
+      <img class="char-thumb" id="thumb-chunsim"
+        src="img/chunsim.jpg"
+        onerror="this.style.display='none';document.getElementById('fb-chunsim').style.display='flex'"
+        alt="Chunsim">
+      <div class="char-thumb-fallback a" id="fb-chunsim" style="display:none">CS</div>
+      <div class="char-info">
+        <div class="char-name"><span class="tier-pill tp-a">A-TIER</span>Chunsim</div>
+        <div class="char-latin">춘심</div>
+        <div class="char-badges">
+          <span class="badge bgr">Misterius</span>
+          <span class="badge bb">Diam-diam Kuat</span>
+        </div>
+        <div class="char-desc">Sedikit bicara, tapi tindakannya berbicara keras.</div>
+      </div>
+    </div>
+
+    <!-- BAEK -->
+    <div class="char-card tier-b" onclick="openDetail('baek')">
+      <img class="char-thumb" id="thumb-baek"
+        src="img/baeksuzi.jpg"
+        onerror="this.style.display='none';document.getElementById('fb-baek').style.display='flex'"
+        alt="Baek">
+      <div class="char-thumb-fallback b" id="fb-baek" style="display:none">BK</div>
+      <div class="char-info">
+        <div class="char-name"><span class="tier-pill tp-b">B-TIER</span>Baeksuzi (Klan Baek)</div>
+        <div class="char-latin">Baek · 백</div>
+        <div class="char-badges">
+          <span class="badge bgr">Koneksi Kuat</span>
+          <span class="badge br">Organisasi Elite</span>
+        </div>
+        <div class="char-desc">Pengaruh besar lewat jaringan & organisasi kuat.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DETAIL PAGE -->
+<div id="page-detail">
+  <div class="detail-hero-wrap">
+    <img class="detail-hero-img" id="detail-hero-img" src="" alt=""
+      onerror="this.style.display='none';document.getElementById('detail-hero-fb').style.display='flex'">
+    <div class="detail-hero-fallback" id="detail-hero-fb" style="display:none"></div>
+    <div class="hero-grad"></div>
+    <div class="hero-name-overlay">
+      <div class="hero-tier-pill" id="detail-tier-pill"></div>
+      <div class="hero-char-name" id="detail-hero-name"></div>
+      <div class="hero-char-latin" id="detail-hero-latin"></div>
+    </div>
+  </div>
+  <div class="detail-body">
+    <div class="detail-badges" id="detail-badges"></div>
+    <div class="detail-desc" id="detail-desc"></div>
+    <div class="section-label">Combat Stats</div>
+    <div id="detail-stats"></div>
+    <div class="lore-box">
+      <div class="lore-title">Lore</div>
+      <div class="lore-text" id="detail-lore"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  degun: {
+    tier: 's',
+    tierLabel: 'S-TIER · PETARUNG ELIT',
+    name: 'Degun — Gun Park',
+    latin: 'Park Gun · 박건',
+    imgSmall: 'img/degun.jpg',
+    imgHero: 'img/degun.jpg',
+    fallbackLetter: 'DG',
+    badges: [
+      {cls:'bg', text:'Top Tier Fighter'},
+      {cls:'br', text:'Sadis'},
+      {cls:'bb', text:'Mentor'},
+      {cls:'bgr', text:'Cold-Blooded'},
+    ],
+    desc: 'Petarung elit yang hampir tidak tertandingi di dunia Lookism. Kepribadiannya dingin dan kalkulatif — dia tidak bertarung untuk kesenangan, tapi untuk mendominasi. Caranya melatih orang lain sering brutal: dia menguji batas kemampuan muridnya tanpa belas kasihan.',
+    stats: [
+      {name:'Kekuatan', val:97},
+      {name:'Kecepatan', val:93},
+      {name:'Teknik', val:95},
+      {name:'Ancaman', val:99},
+    ],
+    lore: 'Gun Park adalah salah satu puncak piramida kekuatan di Lookism. Hubungannya dengan Goo Kim (Jonggun) membentuk duo paling berbahaya — keduanya saling melengkapi seperti dua sisi mata pisau yang berbeda bentuk tapi sama tajamnya.',
+  },
+  jonggun: {
+    tier: 's',
+    tierLabel: 'S-TIER · WEAPON MASTER',
+    name: 'Jonggun — Goo Kim',
+    latin: 'Kim Goo · 김구',
+    imgSmall: 'img/jonggun.jpg',
+    imgHero: 'img/jonggun.jpg',
+    fallbackLetter: 'JG',
+    badges: [
+      {cls:'bg', text:'Weapon Specialist'},
+      {cls:'bgg', text:'Santai'},
+      {cls:'br', text:'Mematikan'},
+      {cls:'bb', text:'Partner Gun'},
+    ],
+    desc: 'Jangan tertipu sikapnya yang kalem dan suka bercanda — di balik itu ada salah satu petarung paling berbahaya di cerita. Spesialisasinya pada senjata membuatnya hampir tak tersentuh dalam jarak jauh maupun dekat.',
+    stats: [
+      {name:'Kekuatan', val:95},
+      {name:'Senjata', val:99},
+      {name:'IQ Tempur', val:90},
+      {name:'Ancaman', val:96},
+    ],
+    lore: 'Goo Kim dan Gun Park adalah dua karakter yang hampir selalu muncul berdampingan. Sementara Gun adalah ancaman langsung yang dingin, Goo adalah ancaman yang tidak terduga — sering muncul dari sudut yang tidak disangka, dengan senjata yang sudah siap.',
+  },
+  chunsim: {
+    tier: 'a',
+    tierLabel: 'A-TIER · MISTERIUS',
+    name: 'Chunsim',
+    latin: '춘심',
+    imgSmall: 'img/chunsim.jpg',
+    imgHero: 'img/chunsim.jpg',
+    fallbackLetter: 'CS',
+    badges: [
+      {cls:'bgr', text:'Misterius'},
+      {cls:'bb', text:'Diam-diam Kuat'},
+      {cls:'bgg', text:'Aura Kuat'},
+    ],
+    desc: 'Chunsim bukan tipe yang banyak bicara. Tapi setiap gerakannya terasa berat dan penuh makna. Kemampuan bertarungnya sering diremehkan orang yang baru mengenalnya — kesalahan yang sangat mahal untuk dilakukan.',
+    stats: [
+      {name:'Kekuatan', val:80},
+      {name:'Aura', val:90},
+      {name:'Teknik', val:78},
+      {name:'Misteri', val:95},
+    ],
+    lore: 'Chunsim adalah salah satu karakter yang latar belakangnya tidak terlalu jelas — dan justru itulah yang membuatnya menarik. Setiap kali dia muncul dalam situasi konflik, penonton selalu bertanya-tanya seberapa jauh kemampuan sesungguhnya.',
+  },
+  baek: {
+    tier: 'b',
+    tierLabel: 'B-TIER · ELITE NETWORK',
+    name: 'Baeksuzi — Klan Baek',
+    latin: 'Baek · 백',
+    imgSmall: 'img/baeksuzi.jpg',
+    imgHero: 'img/baeksuzi.jpg',
+    fallbackLetter: 'BK',
+    badges: [
+      {cls:'bgr', text:'Koneksi Kuat'},
+      {cls:'br', text:'Organisasi Elite'},
+      {cls:'bg', text:'Pengaruh Besar'},
+    ],
+    desc: 'Keluarga Baek bukan sekadar nama — mereka adalah kekuatan tersembunyi di balik banyak konflik besar antar geng di Lookism. Pengaruh mereka berasal dari jaringan dan organisasi kuat yang sudah dibangun lama.',
+    stats: [
+      {name:'Fisik', val:70},
+      {name:'Pengaruh', val:88},
+      {name:'Koneksi', val:85},
+      {name:'Ancaman', val:75},
+    ],
+    lore: 'Klan Baek sering disebut dalam konteks konflik besar yang melibatkan organisasi-organisasi top di dunia Lookism. Posisi mereka dalam hierarki kekuatan cerita terus berkembang seiring narasi yang semakin dalam.',
+  },
+};
+
+const TIER_COLORS = {
+  s: { pill:'tp-s', heroStyle:'background:#1e1800;color:#e8c84a22', valCls:'sv-s', fillCls:'sf-s', fbCls:'s' },
+  a: { pill:'tp-a', heroStyle:'background:#141414;color:#c0c0c015', valCls:'sv-a', fillCls:'sf-a', fbCls:'a' },
+  b: { pill:'tp-b', heroStyle:'background:#130e06;color:#cd7f3215', valCls:'sv-b', fillCls:'sf-b', fbCls:'b' },
+};
+
+function openDetail(id) {
+  const d = DATA[id];
+  const t = TIER_COLORS[d.tier];
+
+  // hero image
+  const heroImg = document.getElementById('detail-hero-img');
+  const heroFb  = document.getElementById('detail-hero-fb');
+  heroImg.style.display = 'block';
+  heroFb.style.display  = 'none';
+  heroImg.src = d.imgHero;
+  heroImg.alt = d.name;
+  heroFb.className = 'detail-hero-fallback ' + t.fbCls;
+  heroFb.style.cssText = t.heroStyle;
+  heroFb.textContent = d.fallbackLetter;
+
+  // overlay text
+  document.getElementById('detail-tier-pill').className = 'hero-tier-pill ' + t.pill;
+  document.getElementById('detail-tier-pill').textContent = d.tierLabel;
+  document.getElementById('detail-hero-name').textContent = d.name;
+  document.getElementById('detail-hero-latin').textContent = d.latin;
+
+  // badges
+  document.getElementById('detail-badges').innerHTML = d.badges.map(b =>
+    `<span class="badge ${b.cls}">${b.text}</span>`
+  ).join('');
+
+  document.getElementById('detail-desc').textContent = d.desc;
+  document.getElementById('detail-lore').textContent = d.lore;
+
+  // stats
+  document.getElementById('detail-stats').innerHTML = d.stats.map(s => `
+    <div class="stat-row">
+      <div class="stat-head">
+        <span class="stat-name">${s.name}</span>
+        <span class="stat-val ${t.valCls}">${s.val}</span>
+      </div>
+      <div class="stat-track">
+        <div class="stat-fill ${t.fillCls}" style="width:0%" data-val="${s.val}"></div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('page-home').style.display = 'none';
+  document.getElementById('page-detail').style.display = 'block';
+  document.getElementById('nav-back').classList.add('show');
+  window.scrollTo(0, 0);
+
+  // animate bars
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.stat-fill').forEach(el => {
+        el.style.width = el.dataset.val + '%';
+      });
+    });
+  });
+}
+
+function goHome() {
+  document.getElementById('page-detail').style.display = 'none';
+  document.getElementById('page-home').style.display = 'block';
+  document.getElementById('nav-back').classList.remove('show');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
